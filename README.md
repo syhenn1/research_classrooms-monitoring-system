@@ -1,70 +1,80 @@
-# Getting Started with Create React App
+# Sistem Monitoring Aktivitas Kelas Berbasis Visi Komputer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-00FFFF?style=for-the-badge&logo=yolo&logoColor=black)](https://github.com/ultralytics/ultralytics)
 
-## Available Scripts
+Repositori ini berisi kode untuk Sistem Monitoring Kelas yang dirancang untuk mendeteksi dan mencatat aktivitas siswa secara *real-time* menggunakan deteksi objek. Sistem ini mampu mengidentifikasi berbagai perilaku kunci di dalam kelas dan menyajikannya melalui antarmuka web yang interaktif.
 
-In the project directory, you can run:
+## ✨ Fitur Utama
 
-### `npm start`
+-   **Deteksi Objek Real-Time**: Menggunakan model **YOLOv8n** yang telah di-*training* ulang untuk mengidentifikasi aktivitas spesifik di kelas.
+-   **Logging Berbasis Kejadian**: Sistem secara cerdas mencatat perubahan status atau kejadian yang signifikan.
+-   **Filter Durasi**: *Log* hanya akan dicatat jika sebuah kejadian berlangsung selama **5 detik atau lebih**, mengurangi *noise* dari perubahan sesaat.
+-   **Penghitung Kejadian (*Counter*)**: Setiap *log* yang tercatat dilengkapi dengan penghitung untuk melacak frekuensi setiap kejadian.
+-   **Antarmuka Pengguna Modern**: *Frontend* dibangun menggunakan **ReactJS** untuk visualisasi data yang dinamis dan responsif.
+-   **Empat Kelas Deteksi**: Model dilatih untuk mengenali 4 kategori aktivitas utama siswa.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠️ Tumpukan Teknologi (Tech Stack)
 
-### `npm test`
+-   **Model Deteksi**: Custom model yang dilatih menggunakan **YOLOv8n** (`yolov8n.pt` sebagai *pretrained weights*).
+-   **Frontend**: [ReactJS](https://reactjs.org/)
+-   **Backend**: **[Placeholder]** - *Backend belum ditentukan. Logika saat ini dijalankan di sisi klien atau skrip Python terpisah.*
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🎯 Kelas Deteksi
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Model ini dilatih untuk mendeteksi 4 kelas perilaku utama yang relevan dengan lingkungan belajar:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1.  **`gaze`**: Menganalisis arah pandangan atau fokus siswa, apakah memperhatikan guru/papan tulis atau tidak.
+2.  **`sitting_position`**: Mendeteksi posisi duduk siswa (misalnya, tegak, membungkuk, atau posisi tidak wajar lainnya).
+3.  **`note_taking`**: Mengidentifikasi aktivitas mencatat atau menulis oleh siswa.
+4.  **`disruption_events`**: Mengenali kejadian yang berpotensi mengganggu, seperti mengobrol, menggunakan ponsel, atau meninggalkan kursi.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## ⚙️ Cara Kerja Logging
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Sistem ini dirancang untuk tidak membanjiri *log* dengan perubahan kecil. Sebuah kejadian baru akan dicatat ke dalam sistem *log* jika memenuhi kondisi berikut:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1.  Sistem mendeteksi adanya perubahan status dari aktivitas sebelumnya (misalnya, dari `gaze` fokus menjadi `disruption_event`).
+2.  Status baru tersebut **bertahan secara konsisten selama minimal 5 detik**.
+3.  Setelah kondisi terpenuhi, sistem akan menyimpan *log* baru dan memperbarui *counter* untuk kejadian tersebut.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Contoh alur *log*:
+- `10:05:03` - `note_taking` terdeteksi.
+- `10:05:04` - `note_taking` masih terdeteksi.
+- `...`
+- `10:05:08` - Kondisi 5 detik terpenuhi, **Log dicatat**: `[10:05:08] Event: note_taking, Count: 1`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🚀 Instalasi & Penggunaan
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Berikut adalah langkah-langkah dasar untuk menjalankan proyek ini.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Prasyarat
 
-### Code Splitting
+-   Node.js & npm
+-   Python 3.8+
+-   Pip & Git
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Frontend (ReactJS)
 
-### Analyzing the Bundle Size
+```bash
+# 1. Clone repositori
+git clone [https://github.com/](https://github.com/)[USERNAME]/[NAMA-REPOSITORI].git
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# 2. Masuk ke direktori frontend
+cd [NAMA-REPOSITORI]/frontend
 
-### Making a Progressive Web App
+# 3. Instal semua dependency
+npm install
+npm install concurrently
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# 4. Jalankan aplikasi React
+npm start
