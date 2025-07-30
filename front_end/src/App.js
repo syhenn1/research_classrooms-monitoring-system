@@ -5,7 +5,7 @@ import Screen from './components/Screen';
 function App() {
 return (
     <div>
-      <h1>Monitoring Kelas</h1>
+      <h1>test Kelas</h1>
       <Screen>
         <MonitorScreen />
         <Logs />
