@@ -1,6 +1,5 @@
 # Sistem Monitoring Aktivitas Kelas Berbasis Visi Komputer
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![YOLOv8](https://img.shields.io/badge/YOLOv8-00FFFF?style=for-the-badge&logo=yolo&logoColor=black)](https://github.com/ultralytics/ultralytics)
@@ -69,10 +68,7 @@ Berikut adalah langkah-langkah dasar untuk menjalankan proyek ini.
 # 1. Clone repositori
 git clone [https://github.com/](https://github.com/)[USERNAME]/[NAMA-REPOSITORI].git
 
-# 2. Masuk ke direktori frontend
-cd [NAMA-REPOSITORI]/frontend
-
-# 3. Instal semua dependency
+# 2. Instal semua dependency
 npm install
 npm install concurrently
 
