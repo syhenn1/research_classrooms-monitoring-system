@@ -72,5 +72,5 @@ git clone [https://github.com/](https://github.com/)[USERNAME]/[NAMA-REPOSITORI]
 npm install
 npm install concurrently
 
-# 4. Jalankan aplikasi React
+# 3. Jalankan aplikasi React
 npm start
