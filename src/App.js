@@ -1,17 +1,19 @@
-import MonitorScreen from './components/MonitorScreen';
-import Logs from './components/Logs';
-import Screen from './components/Screen';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import SetupPage from "./pages/SetupPage";
+import MonitoringPage from "./pages/MonitoringPage";
+import ResultPage from "./pages/ResultPage";
+import "./index.css";
 
 function App() {
-return (
-  
-    <div>
-      <Screen>
-      <h1 className='text-3xl bg-blue-500'>Monitoring Kelas</h1>
-        <MonitorScreen />
-        <Logs />
-      </Screen>
-    </div>
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/setup" />} />
+        <Route path="/setup" element={<SetupPage />} />
+        <Route path="/monitoring" element={<MonitoringPage />} />
+        <Route path="/result" element={<ResultPage />} />
+      </Routes>
+    </Router>
   );
 }
 
