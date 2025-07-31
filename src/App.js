@@ -4,9 +4,10 @@ import Screen from './components/Screen';
 
 function App() {
 return (
+  
     <div>
-      <h1>Monitoring Kelas</h1>
       <Screen>
+      <h1 className='text-3xl bg-blue-500'>Monitoring Kelas</h1>
         <MonitorScreen />
         <Logs />
       </Screen>
