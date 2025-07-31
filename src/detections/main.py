@@ -8,7 +8,7 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-model = YOLO('models/disruption-best-v2.pt')
+model = YOLO('models/yolov8n.pt')
 class_names = model.names
 cap = cv2.VideoCapture(0)
 

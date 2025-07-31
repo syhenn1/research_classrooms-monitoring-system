@@ -1,13 +1,11 @@
 const Screen = ({ children }) => {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      alignItems: 'flex-start',
-      gap: '20px',
-      padding: '20px'
-    }}>
+    <div
+      style={{
+        gap: "20px",
+        padding: "40px",
+      }}
+    >
       {children}
     </div>
   );
