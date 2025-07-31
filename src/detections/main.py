@@ -3,18 +3,20 @@ from flask_cors import CORS
 import cv2
 from ultralytics import YOLO
 from datetime import datetime
+from collections import defaultdict
 import time
 
 app = Flask(__name__)
 CORS(app)
 
-model = YOLO('models/disruption-best-v2.pt')
+model = YOLO('models/yolov8n.pt')
 class_names = model.names
 cap = cv2.VideoCapture(0)
 
 logs = []
 log_interval = 5  # dalam detik
 active_labels = {}  # {label: {'start': timestamp, 'logged': bool}}
+total_counter = defaultdict(int)
 
 def generate_frames():
     while True:
@@ -52,6 +54,8 @@ def generate_frames():
                         'time': datetime.now().strftime('%I:%M:%S %p')
                     })
                     active_labels[label]['logged'] = True
+                    total_counter[label] += 1  # Tambah ke total jika sudah log
+
 
         # Hapus label yang tidak muncul lagi (reset)
         for label in list(active_labels.keys()):
@@ -70,6 +74,11 @@ def video_feed():
 @app.route('/api/logs')
 def get_logs():
     return jsonify(logs[-30:])
+
+@app.route('/api/total')
+def total_count():
+    return jsonify({'total': len(logs)})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

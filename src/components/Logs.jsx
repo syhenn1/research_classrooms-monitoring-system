@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 
 const Logs = () => {
   const [logs, setLogs] = useState([]);
-  const [eventCounts, setEventCounts] = useState({}); // Counter kejadian
+  const [setEventCounts] = useState({}); // Counter kejadian
   const activeLabels = useRef({}); // Untuk tracking deteksi aktif
 
   useEffect(() => {
@@ -50,25 +50,15 @@ const Logs = () => {
     const interval = setInterval(fetchLogs, 1000); // Cek tiap detik
 
     return () => clearInterval(interval);
-  }, []);
+  }, [setEventCounts]);
 
   return (
-    <div>
-      <h2>Logs Deteksi</h2>
-      <ul>
+    <div className="bg-[#EEEEEE] p-4 w-full h-full shadow overflow-y-auto">
+      <ul className="space-y-1 text-sm w-full break-words">
         {logs.map((log, index) => (
-          <li key={index}>
+          <li key={index} className="w-full">
             <strong>{log.label}</strong> ({log.confidence}%) at{" "}
             {new Date(log.time).toLocaleTimeString()}
-          </li>
-        ))}
-      </ul>
-
-      <h3>Counter Kejadian (≥ 5 detik)</h3>
-      <ul>
-        {Object.entries(eventCounts).map(([label, count]) => (
-          <li key={label}>
-            {label}: <strong>{count}</strong> kejadian
           </li>
         ))}
       </ul>
