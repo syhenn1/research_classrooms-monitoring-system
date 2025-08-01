@@ -4,24 +4,24 @@
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![YOLOv8](https://img.shields.io/badge/YOLOv8-00FFFF?style=for-the-badge&logo=yolo&logoColor=black)](https://github.com/ultralytics/ultralytics)
 
-Repositori ini berisi kode untuk Sistem Monitoring Kelas yang dirancang untuk mendeteksi dan mencatat aktivitas siswa secara *real-time* menggunakan deteksi objek. Sistem ini mampu mengidentifikasi berbagai perilaku kunci di dalam kelas dan menyajikannya melalui antarmuka web yang interaktif.
+Repositori ini berisi kode untuk Sistem Monitoring Kelas yang dirancang untuk mendeteksi dan mencatat aktivitas siswa secara _real-time_ menggunakan deteksi objek. Sistem ini mampu mengidentifikasi berbagai perilaku kunci di dalam kelas dan menyajikannya melalui antarmuka web yang interaktif.
 
 ## ✨ Fitur Utama
 
--   **Deteksi Objek Real-Time**: Menggunakan model **YOLOv8n** yang telah di-*training* ulang untuk mengidentifikasi aktivitas spesifik di kelas.
--   **Logging Berbasis Kejadian**: Sistem secara cerdas mencatat perubahan status atau kejadian yang signifikan.
--   **Filter Durasi**: *Log* hanya akan dicatat jika sebuah kejadian berlangsung selama **5 detik atau lebih**, mengurangi *noise* dari perubahan sesaat.
--   **Penghitung Kejadian (*Counter*)**: Setiap *log* yang tercatat dilengkapi dengan penghitung untuk melacak frekuensi setiap kejadian.
--   **Antarmuka Pengguna Modern**: *Frontend* dibangun menggunakan **ReactJS** untuk visualisasi data yang dinamis dan responsif.
--   **Empat Kelas Deteksi**: Model dilatih untuk mengenali 4 kategori aktivitas utama siswa.
+- **Deteksi Objek Real-Time**: Menggunakan model **YOLOv8n** yang telah di-_training_ ulang untuk mengidentifikasi aktivitas spesifik di kelas.
+- **Logging Berbasis Kejadian**: Sistem secara cerdas mencatat perubahan status atau kejadian yang signifikan.
+- **Filter Durasi**: _Log_ hanya akan dicatat jika sebuah kejadian berlangsung selama **5 detik atau lebih**, mengurangi _noise_ dari perubahan sesaat.
+- **Penghitung Kejadian (_Counter_)**: Setiap _log_ yang tercatat dilengkapi dengan penghitung untuk melacak frekuensi setiap kejadian.
+- **Antarmuka Pengguna Modern**: _Frontend_ dibangun menggunakan **ReactJS** untuk visualisasi data yang dinamis dan responsif.
+- **Empat Kelas Deteksi**: Model dilatih untuk mengenali 4 kategori aktivitas utama siswa.
 
 ---
 
 ## 🛠️ Tumpukan Teknologi (Tech Stack)
 
--   **Model Deteksi**: Custom model yang dilatih menggunakan **YOLOv8n** (`yolov8n.pt` sebagai *pretrained weights*).
--   **Frontend**: [ReactJS](https://reactjs.org/)
--   **Backend**: **[Placeholder]** - *Backend belum ditentukan. Logika saat ini dijalankan di sisi klien atau skrip Python terpisah.*
+- **Model Deteksi**: Custom model yang dilatih menggunakan **YOLOv8n** (`yolov8n.pt` sebagai _pretrained weights_).
+- **Frontend**: [ReactJS](https://reactjs.org/)
+- **Backend**: **[Placeholder]** - _Backend belum ditentukan. Logika saat ini dijalankan di sisi klien atau skrip Python terpisah._
 
 ---
 
@@ -38,13 +38,14 @@ Model ini dilatih untuk mendeteksi 4 kelas perilaku utama yang relevan dengan li
 
 ## ⚙️ Cara Kerja Logging
 
-Sistem ini dirancang untuk tidak membanjiri *log* dengan perubahan kecil. Sebuah kejadian baru akan dicatat ke dalam sistem *log* jika memenuhi kondisi berikut:
+Sistem ini dirancang untuk tidak membanjiri _log_ dengan perubahan kecil. Sebuah kejadian baru akan dicatat ke dalam sistem _log_ jika memenuhi kondisi berikut:
 
 1.  Sistem mendeteksi adanya perubahan status dari aktivitas sebelumnya (misalnya, dari `gaze` fokus menjadi `disruption_event`).
 2.  Status baru tersebut **bertahan secara konsisten selama minimal 5 detik**.
-3.  Setelah kondisi terpenuhi, sistem akan menyimpan *log* baru dan memperbarui *counter* untuk kejadian tersebut.
+3.  Setelah kondisi terpenuhi, sistem akan menyimpan _log_ baru dan memperbarui _counter_ untuk kejadian tersebut.
 
-Contoh alur *log*:
+Contoh alur _log_:
+
 - `10:05:03` - `note_taking` terdeteksi.
 - `10:05:04` - `note_taking` masih terdeteksi.
 - `...`
@@ -58,9 +59,9 @@ Berikut adalah langkah-langkah dasar untuk menjalankan proyek ini.
 
 ### Prasyarat
 
--   Node.js & npm
--   Python 3.8+
--   Pip & Git
+- Node.js & npm
+- Python 3.8+
+- Pip & Git
 
 ### Frontend (ReactJS)
 
@@ -74,3 +75,25 @@ npm install concurrently
 
 # 3. Jalankan aplikasi React
 npm start
+```
+
+### Backend (Python)
+
+```bash
+# 1. Pindah ke direktori backend
+cd src/backend
+
+# 2. Buat virtual environment
+python -m venv venv
+
+# 3. Aktifkan virtual environment
+# Windows
+venv\Scripts\activate
+
+# Mac/Linux
+source venv/bin/activate
+
+# 4. Instal dependency Python (jika tersedia requirements.txt)
+pip install -r requirements.txt
+
+```
