@@ -77,7 +77,7 @@ npm install concurrently
 npm start
 ```
 
-### Backend (Python)
+### Backend (Python & MySQL)
 
 ```bash
 # 1. Pindah ke direktori backend
