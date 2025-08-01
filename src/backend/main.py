@@ -4,6 +4,9 @@ import cv2
 from ultralytics import YOLO
 from datetime import datetime
 from collections import defaultdict
+import mysql.connector
+from db_config import get_connection
+
 import time
 
 app = Flask(__name__)
@@ -48,13 +51,27 @@ def generate_frames():
             else:
                 duration = now - active_labels[label]['start']
                 if duration >= log_interval and not active_labels[label]['logged']:
+                    timestamp = datetime.now()
+                    
+                    # Simpan ke database
+                    conn = get_connection()
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "INSERT INTO logs (label, confidence, timestamp) VALUES (%s, %s, %s)",
+                        (label, round(conf * 100, 2), timestamp)
+                    )
+                    conn.commit()
+                    conn.close()
+
                     logs.append({
                         'label': label,
                         'confidence': round(conf * 100, 2),
-                        'time': datetime.now().strftime('%I:%M:%S %p')
+                        'time': timestamp.strftime('%Y-%m-%dT%H:%M:%S')
                     })
+                    
                     active_labels[label]['logged'] = True
-                    total_counter[label] += 1  # Tambah ke total jika sudah log
+                    total_counter[label] += 1
+
 
 
         # Hapus label yang tidak muncul lagi (reset)
