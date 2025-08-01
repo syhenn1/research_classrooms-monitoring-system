@@ -18,7 +18,7 @@
   "scripts": {
     "start": "concurrently \"npm run start-react\" \"npm run start-backend\"",
     "start-react": "set PORT=3001 && react-scripts start",
-    "start-backend": "cd src/detections && python main.py",
+    "start-backend": "cd src/backend && python main.py",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
