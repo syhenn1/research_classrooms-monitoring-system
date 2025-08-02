@@ -3,3 +3,5 @@ flask-cors
 opencv-python
 ultralytics
 mysql-connector-python
+Flask-Migrate
+Flask-SQLAlchemy
