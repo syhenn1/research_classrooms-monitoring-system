@@ -1,5 +1,0 @@
-Flask
-flask-cors
-opencv-python
-ultralytics
-mysql-connector-python
