@@ -6,10 +6,11 @@ from datetime import datetime
 from collections import defaultdict
 import mysql.connector
 from db_config import get_connection
+from app import create_app
 
 import time
 
-app = Flask(__name__)
+app = create_app()
 CORS(app)
 
 model = YOLO('models/yolov8n.pt')

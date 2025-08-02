@@ -67,11 +67,12 @@ Berikut adalah langkah-langkah dasar untuk menjalankan proyek ini.
 
 ```bash
 # 1. Clone repositori
-git clone [https://github.com/](https://github.com/)[USERNAME]/[NAMA-REPOSITORI].git
+git clone https://github.com/syhenn1/research_classrooms-monitoring-system.git
 
 # 2. Instal semua dependency
-npm install
-npm install concurrently
+npm install concurrently react-router-dom
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init
 
 # 3. Jalankan aplikasi React
 npm start
@@ -81,7 +82,7 @@ npm start
 
 ```bash
 # 1. Pindah ke direktori backend
-cd src/backend
+cd backend
 
 # 2. Buat virtual environment
 python -m venv venv
@@ -95,5 +96,17 @@ source venv/bin/activate
 
 # 4. Instal dependency Python (jika tersedia requirements.txt)
 pip install -r requirements.txt
+
+# 5. Jalankan Script untuk Membuat Database
+python dbsetup.py
+
+# 6. Inisialisasi Flask-Migrate (hanya sekali di awal project)
+flask --app main db init
+
+# 7. Buat Migration Script dari Model yang ada
+flask --app main db migrate -m "Initial migration"
+
+# 8. Apply Migration ke Database
+flask --app main db upgrade
 
 ```
