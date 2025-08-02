@@ -69,20 +69,21 @@ Berikut adalah langkah-langkah dasar untuk menjalankan proyek ini.
 # 1. Clone repositori
 git clone https://github.com/syhenn1/research_classrooms-monitoring-system.git
 
-# 2. Instal semua dependency
+# 2. Pindah ke direktori FrontEnd
+cd frontend
+
+# 3. Instal semua dependency
 npm install concurrently react-router-dom
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init
 
-# 3. Jalankan aplikasi React
-npm start
 ```
 
 ### Backend (Python)
 
 ```bash
-# 1. Pindah ke direktori backend
-cd backend
+# 1. Pindah ke direktori BackEnd
+cd ../backend
 
 # 2. Buat virtual environment
 python -m venv venv
@@ -108,5 +109,18 @@ flask --app main db migrate -m "Initial migration"
 
 # 8. Apply Migration ke Database
 flask --app main db upgrade
+
+```
+
+
+# Menjalankan Sistem
+
+```bash
+
+# 1. Pindah ke direktori FrontEnd
+cd ../frontend
+
+# 2. Jalankan aplikasi React
+npm start
 
 ```
