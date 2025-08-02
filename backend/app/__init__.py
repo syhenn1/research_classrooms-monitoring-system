@@ -9,7 +9,7 @@ def create_app():
     app = Flask(__name__)
     
     # Config Database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/monitoring_system_migration'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/monitoring_system'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Init Extensions
