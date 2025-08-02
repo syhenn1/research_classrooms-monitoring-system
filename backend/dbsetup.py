@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 
-DB_NAME = 'monitoring_system_migration'
+DB_NAME = 'monitoring_system'
 
 def create_database():
     try:
