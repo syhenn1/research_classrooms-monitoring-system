@@ -13,7 +13,7 @@ import time
 app = create_app()
 CORS(app)
 
-model = YOLO('models/yolov8n.pt')
+model = YOLO('models/cheating-best.pt')
 class_names = model.names
 cap = cv2.VideoCapture(0)
 
