@@ -98,18 +98,6 @@ source venv/bin/activate
 # 4. Instal dependency Python (jika tersedia requirements.txt)
 pip install -r requirements.txt
 
-# 5. Jalankan Script untuk Membuat Database
-python dbsetup.py
-
-# 6. Inisialisasi Flask-Migrate (hanya sekali di awal project)
-flask --app main db init
-
-# 7. Buat Migration Script dari Model yang ada
-flask --app main db migrate -m "Initial migration"
-
-# 8. Apply Migration ke Database
-flask --app main db upgrade
-
 ```
 
 
