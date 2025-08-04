@@ -57,6 +57,7 @@ const Logs = () => {
       <ul className="space-y-1 text-sm w-full break-words">
         {logs.map((log, index) => (
           <li key={index} className="w-full">
+            ({log.classtype}){" - "}
             <strong>{log.label}</strong> ({log.confidence}%) at{" "}
             {new Date(log.time).toLocaleTimeString()}
           </li>
