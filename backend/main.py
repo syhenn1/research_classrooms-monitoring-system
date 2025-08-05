@@ -8,10 +8,6 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-sessions = []
-logs = []
-active_session_id = None
-
 model = YOLO('models/yolov8n.pt')
 class_names = model.names
 cap = cv2.VideoCapture(0)
