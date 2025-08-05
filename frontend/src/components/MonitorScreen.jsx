@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
-const MonitorScreen = () => {
+const MonitorScreen = ({ type }) => {
   const [setLogs] = useState([]);
   const [setEventCounts] = useState({}); // Counter kejadian
   const activeLabels = useRef({}); // Untuk tracking deteksi aktif
@@ -55,7 +55,7 @@ const MonitorScreen = () => {
   return (
     <div className="w-full h-screen overflow-hidden">
       <img
-        src="http://localhost:8000/video_feed"
+        src={`http://localhost:8000/video_feed/${type}`} // Corrected template literal
         alt="Video Stream"
         className="w-full h-full object-cover"
       />
