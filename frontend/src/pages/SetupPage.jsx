@@ -72,24 +72,9 @@ const SetupPage = () => {
           </p>
         </header>
 
-        <main className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Fitur Info */}
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              {[
-                { icon: <FiEye />, label: 'Disruption' },
-                { icon: <FiShield />, label: 'Cheating' },
-                { icon: <FiBarChart2 />, label: 'Instant Reporting' },
-              ].map(({ icon, label }, i) => (
-                <div key={i} className="bg-white/10 p-5 rounded-xl transition hover:bg-white/20">
-                  <div className="text-indigo-300 text-3xl mb-2">{icon}</div>
-                  <span className="text-sm font-medium">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* System Check */}
+        {/* Main */}
+        <main className="space-y-12">
+          {/* System Check First */}
           <div className="bg-white/5 p-8 rounded-xl space-y-6">
             <h2 className="text-2xl font-semibold">System Check</h2>
 
@@ -131,6 +116,20 @@ const SetupPage = () => {
             >
               Start Monitoring
             </button>
+          </div>
+
+          {/* Feature Info Second */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            {[
+              { icon: <FiEye />, label: 'Disruption' },
+              { icon: <FiShield />, label: 'Cheating' },
+              { icon: <FiBarChart2 />, label: 'Instant Reporting' },
+            ].map(({ icon, label }, i) => (
+              <div key={i} className="bg-white/10 p-5 rounded-xl transition hover:bg-white/20">
+                <div className="text-indigo-300 text-3xl mb-2">{icon}</div>
+                <span className="text-sm font-medium">{label}</span>
+              </div>
+            ))}
           </div>
         </main>
       </div>
