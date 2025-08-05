@@ -23,7 +23,6 @@ const MonitoringPage = () => {
 
   return (
     <div>
-      <SideBar />
       <div className="p-16 gap-8 w-full flex flex-col h-screen md:flex-row">
         <div className="flex flex-col w-full gap-2">
           <h1 className="text-3xl font-bold mb-4">Monitoring Kelas</h1>
