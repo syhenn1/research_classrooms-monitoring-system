@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MonitorScreen from "../components/MonitorScreen";
 import Logs from "../components/Logs";
-import SideBar from "../components/SideBar";
 import Counter from "../components/Counter";
 import EndMonitoring from "../components/EndMonitoring";
 import SwitchQuiz from "../components/SwitchQuiz";
@@ -12,13 +11,31 @@ const MonitoringPage = () => {
   const [quizStarted, setQuizStarted] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const checkActiveSession = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/active-session');
+        const data = await response.json();
+
+        if (!data.session) {
+          navigate('/home');
+        }
+      } catch (error) {
+        console.error('Failed to fetch active session:', error);
+        navigate('/home');
+      }
+    };
+
+    checkActiveSession();
+  }, [navigate]);
+
   const switchToQuiz = () => {
     setMode("quiz");
-    setQuizStarted(true); // Tombol SwitchQuiz disable permanen setelah ini
+    setQuizStarted(true);
   };
 
   const handleEndMonitoring = () => {
-    navigate("/result"); // Pindah ke halaman result
+    navigate("/result");
   };
 
   return (
