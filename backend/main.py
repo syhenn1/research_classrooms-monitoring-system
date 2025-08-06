@@ -4,13 +4,19 @@ import cv2
 from ultralytics import YOLO
 from datetime import datetime
 import time
+import uuid
 
 app = Flask(__name__)
 CORS(app)
 
+sessions = []
+logs = []
+
 model = YOLO('models/yolov8n.pt')
 class_names = model.names
 cap = cv2.VideoCapture(0)
+
+active_session_id = None
 
 log_interval = 5 
 active_labels = {}
@@ -157,13 +163,12 @@ def get_active_session():
 def create_session():
     data = request.get_json()
     new_session = {
-        'session_id': len(sessions) + 1,
+        'session_id': str(uuid.uuid4()),
         'session_name': data['session_name'],
+        'time': data['time'],
         'date': data['date'],
-        'lecturer': data['lecturer'],
-        'subject': data['subject'],
-        'class_name': data['class_name'],
-        'room': data['room']
+        'theoryTotal': 0,
+        'quizTotal': 0
     }
     sessions.append(new_session)
     return jsonify({
@@ -171,11 +176,28 @@ def create_session():
         'message': 'Session created successfully'
     }), 201
 
+@app.route('/api/sessions/<session_id>', methods=['PATCH'])
+def update_session_totals(session_id):
+    data = request.get_json()
+    session = next((s for s in sessions if s['session_id'] == session_id), None)
+
+    if not session:
+        return jsonify({'message': 'Session not found'}), 404
+
+    # Update fields jika dikirim di request body
+    if 'theoryTotal' in data:
+        session['theoryTotal'] = data['theoryTotal']
+    if 'quizTotal' in data:
+        session['quizTotal'] = data['quizTotal']
+
+    return jsonify({'message': 'Session updated successfully', 'session': session}), 200
+
+
 @app.route('/api/sessions', methods=['GET'])
 def get_sessions():
     return jsonify(sessions)
 
-@app.route('/api/set-session/<int:session_id>', methods=['POST'])
+@app.route('/api/set-session/<session_id>', methods=['POST'])
 def set_active_session(session_id):
     global active_session_id
     active_session_id = session_id
