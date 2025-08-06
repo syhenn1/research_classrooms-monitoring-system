@@ -112,7 +112,7 @@ export default function TimelineLineChart() {
     drawChart();
     window.addEventListener("resize", drawChart);
     return () => window.removeEventListener("resize", drawChart);
-  }, [logs]);
+  });
 
   return (
     <div className="w-full h-64 bg-white rounded-xl shadow-md p-4 relative">
