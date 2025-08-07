@@ -75,6 +75,8 @@ cd frontend
 # 3. Instal semua dependency
 npm install concurrently react-router-dom
 npm install -D tailwindcss postcss autoprefixer
+npm install xlsx
+npm install chart.js react-chartjs-2
 npx tailwindcss init
 
 ```
