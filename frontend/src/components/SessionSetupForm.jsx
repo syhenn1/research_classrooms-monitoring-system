@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { FiFileText } from "react-icons/fi";
+import { useNavigate } from 'react-router-dom';
 
 const SessionSetupForm = ({ time, date, onSessionAdded }) => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     session_name: "",
   });
@@ -38,14 +40,18 @@ const SessionSetupForm = ({ time, date, onSessionAdded }) => {
       await fetch(`http://localhost:8000/api/set-session/${data.session_id}`, {
         method: "POST",
       });
+      
 
       if (onSessionAdded) onSessionAdded();
 
       // GET ACTIVE SESSION DATA
-      const activeResponse = await fetch("http://127.0.0.1:8000/api/active-session");
+      const activeResponse = await fetch(
+        "http://127.0.0.1:8000/api/active-session"
+      );
       if (activeResponse.ok) {
         const activeData = await activeResponse.json();
         setActiveSession(activeData.session);
+        navigate("/monitoring");
       }
     } else {
       alert("Failed to create session.");
@@ -87,13 +93,13 @@ const SessionSetupForm = ({ time, date, onSessionAdded }) => {
           placeholder="Example: Final Exam - Mathematics"
           className="w-full pl-10 pr-4 py-2 bg-dark-blue border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           readOnly={activeSession !== null}
-          required
         />
       </div>
 
       <div className="pt-6">
         <p className="text-sm text-gray-400">
-          Pastikan nama event jelas dan deskriptif. Pengaturan lain dapat diakses setelah monitoring dimulai.
+          Pastikan nama event jelas dan deskriptif. Pengaturan lain dapat
+          diakses setelah monitoring dimulai.
         </p>
       </div>
 
@@ -102,7 +108,7 @@ const SessionSetupForm = ({ time, date, onSessionAdded }) => {
           type="submit"
           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition"
         >
-          Create Session
+          Create Session & Start Monitoring
         </button>
       )}
 
