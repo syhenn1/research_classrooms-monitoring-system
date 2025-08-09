@@ -5,11 +5,14 @@ import Logs from "../components/Logs";
 import Counter from "../components/Counter";
 import EndMonitoring from "../components/EndMonitoring";
 import SwitchQuiz from "../components/SwitchQuiz";
+import { GoDotFill } from "react-icons/go";
+
 
 const MonitoringPage = () => {
   const [mode, setMode] = useState("theory");
   const [quizStarted, setQuizStarted] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [session_name, setSessionName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,6 +34,7 @@ const MonitoringPage = () => {
         .then((data) => {
           if (data.session && data.session.session_id) {
             setSessionId(data.session.session_id);
+            setSessionName(data.session.session_name || "");
           }
         })
         .catch(() => {
@@ -53,7 +57,8 @@ const MonitoringPage = () => {
       });
       const data = await res.json();
       if (data.session_id) {
-        setSessionId(data.session_id); // simpan session_id ke state
+        setSessionId(data.session_id);
+        // simpan session_id ke state
         navigate(`/result?session_id=${data.session_id}`);
       } else {
         navigate("/setup");
@@ -66,22 +71,44 @@ const MonitoringPage = () => {
   };
 
   return (
-    <div>
-      <div className="p-16 gap-8 w-full flex flex-col h-screen md:flex-row">
-        <div className="flex flex-col w-full gap-2">
-          <h1 className="text-3xl font-bold mb-4">
-            Monitoring Kelas {sessionId ? `- ${sessionId}` : ""}
-          </h1>
-          <MonitorScreen type={mode} />
-          <Counter />
-        </div>
-        <div className="flex flex-col w-full md:w-1/3 gap-2 h-full">
-          <h1 className="text-3xl mb-4">Activity Log</h1>
-          <div className="flex-1 overflow-y-auto rounded-xl">
-            <Logs activeSessionId={sessionId} />
+    <div className="flex-1 p-8 overflow-y-auto bg-dark-blue text-white font-sans animate-fade-in">
+      {/* Header */}
+      <header className="mb-8 text-center lg:text-left">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent flex items-center gap-3">
+          <GoDotFill size={24} className="text-red-400 animate-pulse" />
+          Monitoring Kelas {session_name ? `- ${session_name}` : ""}
+        </h1>
+        <p className="text-gray-400 mt-2">
+          Live feed & aktivitas peserta ujian secara real-time.
+        </p>
+      </header>
+
+      {/* Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Live Monitor & Counter */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+            <MonitorScreen type={mode} />
           </div>
-          <SwitchQuiz switchmode={switchToQuiz} disabled={quizStarted} />
-          <EndMonitoring onEnd={handleEndMonitoring} />
+
+          <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 text-center">
+            <Counter />
+          </div>
+        </div>
+
+        {/* Activity Log & Controls */}
+        <div className="flex flex-col gap-6">
+          <div className="backdrop-blur-sm rounded-2xl border p-4 flex-1 overflow-hidden flex flex-col">
+            <h2 className="text-xl font-semibold mb-4">Activity Log</h2>
+            <div className="flex-1 overflow-y-auto rounded-lg border border-white/10">
+              <Logs activeSessionId={sessionId} />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <SwitchQuiz switchmode={switchToQuiz} disabled={quizStarted} />
+            <EndMonitoring onEnd={handleEndMonitoring} />
+          </div>
         </div>
       </div>
     </div>
