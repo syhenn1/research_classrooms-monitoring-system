@@ -10,7 +10,9 @@ const SideBar = () => {
   useEffect(() => {
     const fetchActiveSession = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/active-session');
+        const response = await fetch('http://127.0.0.1:8000/api/active-session', {
+          credentials: 'include',
+        });
         const data = await response.json();
         if (data.session) {
           setHasActiveSession(true);
