@@ -31,7 +31,7 @@ const Logs = ({ activeSessionId }) => {
   }, [activeSessionId, setEventCounts]);
 
   return (
-    <div className="bg-[#EEEEEE] p-4 w-full h-full shadow overflow-y-auto">
+    <div className="bg-[#113F67] p-4 w-full h-full shadow overflow-y-auto">
       <ul className="space-y-1 text-sm w-full break-words">
         {logs.map((log, index) => (
           <li key={index} className="w-full">
