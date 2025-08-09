@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiHome, FiMonitor, FiBarChart2 } from 'react-icons/fi';
 import AlertCard from './AlertCard';
 
 const SideBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasActiveSession, setHasActiveSession] = useState(false);
+  const location = useLocation();
+
+  // Cek apakah lagi di halaman flow ujian
+  const isFlowLocked =
+    location.pathname.startsWith('/monitoring') ||
+    location.pathname.startsWith('/result');
 
   useEffect(() => {
     const fetchActiveSession = async () => {
@@ -33,7 +39,13 @@ const SideBar = () => {
 
   return (
     <>
-      {!hasActiveSession && <AlertCard message="No active session selected. Please create or select a session." />}
+      {!hasActiveSession && !isFlowLocked && (
+        <AlertCard message="No active session selected. Please create or select a session." />
+      )}
+
+      {isFlowLocked && (
+        <AlertCard message="Anda sedang dalam sesi monitoring, harap selesaikan sesi anda dahulu" />
+      )}
 
       <aside
         className={`
@@ -55,18 +67,26 @@ const SideBar = () => {
             ${isExpanded ? 'bg-dark-blue p-4 rounded-2xl shadow-lg' : ''}
           `}
         >
-          <SideBarLink to="/home" icon={FiHome} isExpanded={isExpanded} />
+          <SideBarLink
+            to="/home"
+            icon={FiHome}
+            isExpanded={isExpanded}
+            disabled={isFlowLocked || !hasActiveSession}
+            lockReason={isFlowLocked ? 'Selesaikan Sesi anda dahulu.' : ''}
+          />
           <SideBarLink
             to="/monitoring"
             icon={FiMonitor}
             isExpanded={isExpanded}
-            disabled={!hasActiveSession}
+            disabled={isFlowLocked || !hasActiveSession}
+            lockReason={isFlowLocked ? 'Selesaikan Sesi anda dahulu.' : ''}
           />
           <SideBarLink
             to="/result"
             icon={FiBarChart2}
             isExpanded={isExpanded}
-            disabled={!hasActiveSession}
+            disabled={isFlowLocked || !hasActiveSession}
+            lockReason={isFlowLocked ? 'Selesaikan Sesi anda dahulu.' : ''}
           />
         </div>
       </aside>
@@ -74,13 +94,13 @@ const SideBar = () => {
   );
 };
 
-const SideBarLink = ({ to, icon: Icon, isExpanded, disabled = false }) => {
+const SideBarLink = ({ to, icon: Icon, isExpanded, disabled = false, lockReason = '' }) => {
   const navigate = useNavigate();
 
   const handleClick = (e) => {
     if (disabled) {
       e.preventDefault();
-      alert('No active session! Please create/select one first.');
+      alert(lockReason || 'No active session! Please create/select one first.');
     } else {
       navigate(to);
     }

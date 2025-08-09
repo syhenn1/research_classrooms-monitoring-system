@@ -123,7 +123,7 @@ def find_session_by_id(session_id):
 @app.route('/video_feed/<classtype>')
 def video_feed(classtype):
     if classtype == 'quiz':
-        usedModel = "disruption-best-v3"
+        usedModel = "cheating-best"
     else:
         usedModel = 'yolov8n'
     active_session_id = session.get("active_session_id")
