@@ -5,7 +5,9 @@ const Counter = () => {
 
   const fetchTotal = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/total");
+      const response = await fetch("http://127.0.0.1:8000/api/total", {
+        credentials: "include",
+      });
       const data = await response.json();
 
       // Gunakan `data.person` atau `data.total`, tergantung isi backend

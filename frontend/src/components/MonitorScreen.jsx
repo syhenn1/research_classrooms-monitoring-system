@@ -1,28 +1,28 @@
 import { useEffect, useState, useRef } from "react";
 
 const MonitorScreen = ({ type }) => {
-  const [setLogs] = useState([]);
-  const [setEventCounts] = useState({}); // Counter kejadian
+  const [, setLogs] = useState([]); // State untuk data log
+  const [, setEventCounts] = useState({}); // Counter kejadian
   const activeLabels = useRef({}); // Untuk tracking deteksi aktif
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/logs");
+        const res = await fetch("http://127.0.0.1:8000/api/logs");
         const data = await res.json();
         setLogs(data);
 
-        // Deteksi durasi label yang aktif
         const now = Date.now();
         const latestLabels = new Set(data.map((log) => log.label));
 
-        // Update label aktif dan durasinya
-        Object.entries(activeLabels.current).forEach(([label, obj]) => {
+        // Reset label yang hilang
+        Object.keys(activeLabels.current).forEach((label) => {
           if (!latestLabels.has(label)) {
-            delete activeLabels.current[label]; // label hilang → reset
+            delete activeLabels.current[label];
           }
         });
 
+        // Update label aktif
         latestLabels.forEach((label) => {
           if (!activeLabels.current[label]) {
             activeLabels.current[label] = {
@@ -32,7 +32,6 @@ const MonitorScreen = ({ type }) => {
           } else {
             const duration = now - activeLabels.current[label].start;
             if (duration >= 5000 && !activeLabels.current[label].recorded) {
-              // Sudah lebih dari 5 detik → hitung sebagai 1 kejadian
               setEventCounts((prev) => ({
                 ...prev,
                 [label]: (prev[label] || 0) + 1,
@@ -47,15 +46,14 @@ const MonitorScreen = ({ type }) => {
     };
 
     fetchLogs();
-    const interval = setInterval(fetchLogs, 1000); // Cek tiap detik
-
+    const interval = setInterval(fetchLogs, 1000);
     return () => clearInterval(interval);
-  }, [setEventCounts, setLogs]);
+  }, []);
 
   return (
     <div className="w-full h-screen overflow-hidden">
       <img
-        src={`http://localhost:8000/video_feed/${type}`} // Corrected template literal
+        src={`http://127.0.0.1:8000/video_feed/${type}`}
         alt="Video Stream"
         className="w-full h-full object-cover"
       />
