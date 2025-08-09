@@ -22,7 +22,7 @@
   "scripts": {
     "init": "npm install && cd ../backend && if not exist venv (python -m venv venv) && venv\\Scripts\\activate && pip install -r requirements.txt && python dbsetup.py && flask --app main db init && flask --app main db migrate -m \"Initial migration\" && flask --app main db upgrade && cd ../frontend",
     "start": "concurrently \"npm run start-react\" \"npm run start-backend\"",
-    "start-react": "set PORT=3001 && react-scripts start",
+    "start-react": "set PORT=3000 && react-scripts start",
     "start-backend": "cd ../backend && venv\\Scripts\\activate && python main.py",
     "build": "react-scripts build",
     "test": "react-scripts test",
