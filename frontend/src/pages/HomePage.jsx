@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import SessionHeader from '../components/SessionHeader';
 import SessionSetupForm from '../components/SessionSetupForm';
 import LivePreviewPanel from '../components/LivePreviewPanel';
-import StartMonitoringButton from '../components/StartMonitoringButton';
 
 const HomePage = () => {
-  const navigate = useNavigate();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentDateTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
-  const handleStartMonitoring = () => {
-    navigate('/monitoring');
-  };
 
   const time = currentDateTime.toLocaleTimeString('id-ID', {
     hour: '2-digit',
@@ -40,7 +33,6 @@ const HomePage = () => {
         
         <div className="flex flex-col">
           <SessionSetupForm time={time} date={date} />
-          <StartMonitoringButton onClick={handleStartMonitoring} />
         </div>
         
       </div>

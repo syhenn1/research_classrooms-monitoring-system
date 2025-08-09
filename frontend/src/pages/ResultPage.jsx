@@ -11,6 +11,10 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const sessionId = searchParams.get("session_id");
+
   const [resultData, setResultData] = useState({
     sessionDetails: null,
     totalDisruption: 0,
@@ -22,21 +26,35 @@ const ResultPage = () => {
 
   useEffect(() => {
     const fetchDataAndCalculate = async () => {
+      if (!sessionId) {
+        navigate("/monitor");
+        return;
+      }
+
       try {
-        const sessionResponse = await fetch(
-          "http://127.0.0.1:8000/api/active-session"
+        // Ambil detail session dari endpoint yang kamu kasih
+        const sessionRes = await fetch(
+          `http://127.0.0.1:8000/api/sessions/${sessionId}`,
+          { credentials: "include" }
         );
-        const sessionData = await sessionResponse.json();
-        if (!sessionData.session) {
-          navigate("/home");
+        const sessionJson = await sessionRes.json();
+        if (!sessionJson.session) {
+          navigate("/monitor");
           return;
         }
 
-        const logsResponse = await fetch("http://127.0.0.1:8000/api/logs");
-        const allLogs = await logsResponse.json();
+        // Ambil semua logs
+        const logsRes = await fetch(
+          `http://127.0.0.1:8000/api/logs/${sessionId}`,
+          {
+            credentials: "include",
+          }
+        );
+        const allLogs = await logsRes.json();
 
+        // Filter logs untuk session ini
         const relevantLogs = allLogs.filter(
-          (log) => log.session_id === sessionData.session.session_id
+          (log) => log.session_id === sessionId
         );
         const theoryLogs = relevantLogs.filter(
           (log) => log.classtype === "theory"
@@ -62,7 +80,7 @@ const ResultPage = () => {
         };
 
         setResultData({
-          sessionDetails: sessionData.session,
+          sessionDetails: sessionJson.session,
           totalDisruption: theoryLogs.length,
           totalCheating: quizLogs.length,
           theoryDuration: formatDuration(theoryLogs),
@@ -77,7 +95,7 @@ const ResultPage = () => {
     };
 
     fetchDataAndCalculate();
-  }, [navigate]);
+  }, [sessionId, navigate]);
 
   const handleExportExcel = () => {
     if (!resultData.sessionDetails) return;
@@ -110,9 +128,13 @@ const ResultPage = () => {
 
   const finishSession = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/logs");
+      const res = await fetch(`http://127.0.0.1:8000/api/logs/${sessionId}`, {
+        credentials: "include",
+      });
       const logs = await res.json();
-      const filteredLogs = logs.filter((log) => log.session_id === resultData.sessionDetails.session_id);
+      const filteredLogs = logs.filter(
+        (log) => log.session_id === resultData.sessionDetails.session_id
+      );
 
       const theoryTotal = filteredLogs.filter(
         (log) => log.classtype === "theory"
@@ -121,13 +143,16 @@ const ResultPage = () => {
         (log) => log.classtype === "quiz"
       ).length;
 
-      await fetch(`http://localhost:8000/api/sessions/${resultData.sessionDetails.session_id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ theoryTotal, quizTotal }),
-      });
+      await fetch(
+        `http://127.0.0.1:8000/api/sessions/${resultData.sessionDetails.session_id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ theoryTotal, quizTotal }),
+        }
+      );
       await fetch("http://127.0.0.1:8000/api/session/end", {
         method: "POST",
       });
