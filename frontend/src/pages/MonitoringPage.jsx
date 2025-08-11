@@ -13,7 +13,7 @@ const MonitoringPage = () => {
   const [sessionId, setSessionId] = useState(null);
   const [session_name, setSessionName] = useState("");
   const [showQuizConfirm, setShowQuizConfirm] = useState(false);
-  const [showEndConfirm, setShowEndConfirm] = useState(false); // ✅ modal end monitoring
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,10 +47,22 @@ const MonitoringPage = () => {
     setShowQuizConfirm(true);
   };
 
-  const handleQuizConfirm = () => {
-    setMode("quiz");
-    setQuizStarted(true);
-    setShowQuizConfirm(false);
+  // ✅ PERUBAHAN UTAMA DI SINI
+  const handleQuizConfirm = async () => {
+    try {
+      await fetch("http://127.0.0.1:8000/api/camera/stop", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      setMode("quiz");
+      setQuizStarted(true);
+
+    } catch (error) {
+      console.error("Gagal menghentikan stream sebelum beralih mode:", error);
+    } finally {
+      setShowQuizConfirm(false);
+    }
   };
 
   const handleEndMonitoring = async () => {
@@ -114,7 +126,6 @@ const MonitoringPage = () => {
                 quizStarted
                   ? "bg-gray-600 cursor-not-allowed"
                   : "bg-indigo-600 hover:bg-indigo-700"
-                  
               }`}
             >
               Pindah ke Mode Quiz
