@@ -5,7 +5,7 @@ import SideBar from '../components/SideBar';
 const MainLayout = () => {
   return (
     <div className="flex h-screen bg-gray-100">
-      <SideBar />
+      {/* <SideBar /> */}
       <main className="flex-1 flex flex-col overflow-hidden">
         <Outlet />
       </main>
