@@ -7,8 +7,47 @@ const LivePreviewPanel = () => {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [cameraIndex, setCameraIndex] = useState(0);
   const [videoDevices, setVideoDevices] = useState([]);
+  const [isMonitoringActive, setIsMonitoringActive] = useState(false);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  // Cek apakah ada sesi monitoring aktif
+  useEffect(() => {
+    const checkActiveSession = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/active-session", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setIsMonitoringActive(!!data.session);
+        } else {
+          setIsMonitoringActive(false);
+        }
+      } catch (error) {
+        console.error("Error checking active session:", error);
+        setIsMonitoringActive(false);
+      }
+    };
+
+    // Cek sesi aktif setiap 3 detik
+    checkActiveSession();
+    intervalRef.current = setInterval(checkActiveSession, 3000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  // Matikan kamera otomatis jika monitoring aktif
+  useEffect(() => {
+    if (isMonitoringActive && isCameraOn) {
+      setIsCameraOn(false);
+    }
+  }, [isMonitoringActive]);
 
   useEffect(() => {
     const getDevices = async () => {
@@ -25,7 +64,7 @@ const LivePreviewPanel = () => {
 
   useEffect(() => {
     const startCamera = async () => {
-      if (isCameraOn && videoDevices.length > 0) {
+      if (isCameraOn && videoDevices.length > 0 && !isMonitoringActive) {
         const constraints = {
           video: {
             deviceId: { exact: videoDevices[cameraIndex].deviceId }
@@ -39,7 +78,7 @@ const LivePreviewPanel = () => {
           }
         } catch (error) {
           console.error("Error starting camera:", error);
-          setIsCameraOn(false); // Matikan jika ada error
+          setIsCameraOn(false);
         }
       }
     };
@@ -54,18 +93,25 @@ const LivePreviewPanel = () => {
       }
     };
 
-    if (isCameraOn) {
+    if (isCameraOn && !isMonitoringActive) {
       startCamera();
     } else {
       stopCamera();
     }
 
     return () => {
-      stopCamera(); // Cleanup function untuk mematikan kamera saat komponen hilang
+      stopCamera();
     };
-  }, [isCameraOn, cameraIndex, videoDevices]);
+  }, [isCameraOn, cameraIndex, videoDevices, isMonitoringActive]);
 
-  const handleToggleCamera = () => setIsCameraOn(prev => !prev);
+  const handleToggleCamera = () => {
+    if (isMonitoringActive) {
+      alert("Tidak dapat menggunakan live preview saat monitoring sedang aktif. Silakan akhiri monitoring terlebih dahulu.");
+      return;
+    }
+    setIsCameraOn(prev => !prev);
+  };
+
   const handleNextCamera = () => setCameraIndex(prev => (prev + 1) % videoDevices.length);
   const handlePrevCamera = () => setCameraIndex(prev => (prev - 1 + videoDevices.length) % videoDevices.length);
 
@@ -75,14 +121,23 @@ const LivePreviewPanel = () => {
         <div className="flex items-center gap-2 text-red-400">
           <GoDotFill size={24} className={isCameraOn ? "animate-pulse" : ""} />
           <h3 className="font-semibold text-gray-200">Live Preview</h3>
+          {isMonitoringActive && (
+            <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded">
+              Monitoring Active
+            </span>
+          )}
         </div>
         <div className="w-full aspect-video bg-black rounded-lg flex items-center justify-center mt-4 overflow-hidden">
-          {isCameraOn ? (
+          {isCameraOn && !isMonitoringActive ? (
             <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
           ) : (
             <div className='text-center'>
               <FiPlayCircle className="text-gray-600 text-5xl"/>
-              <p className="text-gray-500 mt-2">Camera feed is off</p>
+              <p className="text-gray-500 mt-2">
+                {isMonitoringActive 
+                  ? "Camera sedang digunakan untuk monitoring" 
+                  : "Camera feed is off"}
+              </p>
             </div>
           )}
         </div>
@@ -94,6 +149,7 @@ const LivePreviewPanel = () => {
         onNextCamera={handleNextCamera}
         cameraIndex={cameraIndex}
         totalCameras={videoDevices.length || 1}
+        disabled={isMonitoringActive}
       />
     </div>
   );
