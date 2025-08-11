@@ -7,11 +7,14 @@ import time
 import uuid
 import threading
 
+# --- Variabel Global ---
 logs_storage = []
 sessions_storage = []
 camera_in_use = False
 camera_lock = threading.Lock()
+stop_stream_event = threading.Event() # <<< PERUBAHAN: Event untuk menghentikan stream
 
+# --- Konfigurasi Aplikasi Flask ---
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.3:3000"])
 
@@ -23,6 +26,7 @@ app.config.update(
 
 PROXIMITY_THRESHOLD = 500
 
+# --- Fungsi Helper ---
 def find_matching_box(label, center_x, center_y, used_ids, instance_labels):
     for existing_id, data in instance_labels.items():
         if existing_id in used_ids:
@@ -40,9 +44,12 @@ def find_matching_box(label, center_x, center_y, used_ids, instance_labels):
 def generate_frames(classtype='None', usedModel='None', active_session_id=None):
     global camera_in_use
     
+    stop_stream_event.clear() # <<< PERUBAHAN: Reset event setiap kali stream dimulai
+
     if not active_session_id:
         print("⚠️ Peringatan: generate_frames dipanggil tanpa active_session_id.")
         return
+        
     with camera_lock:
         if camera_in_use:
             print("⚠️ Kamera sedang digunakan oleh proses lain.")
@@ -56,6 +63,7 @@ def generate_frames(classtype='None', usedModel='None', active_session_id=None):
             camera_in_use = False
         return
 
+    print(f"🚀 Memulai stream untuk model: {usedModel} pada sesi: {active_session_id}")
     instance_labels = {}
     instance_counter = 0
     
@@ -64,7 +72,7 @@ def generate_frames(classtype='None', usedModel='None', active_session_id=None):
     cooldown_interval = 5
 
     try:
-        while True:
+        while not stop_stream_event.is_set(): # <<< PERUBAHAN: Loop berhenti jika event di-set
             success, frame = cap.read()
             if not success:
                 print("❌ Gagal membaca frame dari kamera. Menghentikan stream.")
@@ -139,9 +147,18 @@ def generate_frames(classtype='None', usedModel='None', active_session_id=None):
 def find_session_by_id(session_id):
     return next((s for s in sessions_storage if s['session_id'] == session_id), None)
 
+# --- Endpoints ---
+@app.route('/api/camera/stop', methods=['POST']) # <<< PERUBAHAN: Endpoint baru untuk stop kamera
+def stop_camera_stream():
+    """Endpoint untuk memberi sinyal agar stream kamera berhenti."""
+    print("🔴 Menerima sinyal untuk menghentikan stream kamera.")
+    stop_stream_event.set()
+    # Beri sedikit waktu agar loop di generator bisa berhenti
+    time.sleep(0.5) 
+    return jsonify({'message': 'Sinyal untuk menghentikan stream telah dikirim.'}), 200
+
 @app.route('/api/camera-status')
 def camera_status():
-    """Endpoint untuk cek status kamera"""
     active_session_id = session.get("active_session_id")
     return jsonify({
         'camera_in_use': camera_in_use,
@@ -154,6 +171,7 @@ def video_feed(classtype):
     if classtype == 'quiz':
         usedModel = "disruption-best-v3"
     else:
+        # Asumsikan 'theory' atau mode default lainnya
         usedModel = 'yolov8n'
     
     active_session_id = session.get("active_session_id")
@@ -164,7 +182,6 @@ def video_feed(classtype):
         generate_frames(classtype, usedModel, active_session_id),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
-
 
 @app.route('/api/logs/<session_id>', methods=['GET'])
 def get_logs(session_id):
@@ -179,7 +196,6 @@ def total_count():
 
     count = sum(1 for log in logs_storage if log.get('session_id') == active_session_id)
     return jsonify({'total': count})
-
 
 @app.route('/api/sessions', methods=['POST'])
 def create_session():
@@ -212,7 +228,6 @@ def get_active_session():
         return jsonify({'message': 'Tidak ada sesi aktif'}), 404
     session_found = find_session_by_id(active_id)
     if not session_found:
-        # Mungkin terjadi jika server di-restart tapi cookie client masih ada
         session.pop("active_session_id", None)
         return jsonify({'message': 'Sesi aktif tidak ditemukan di server'}), 404
     return jsonify({'session': session_found}), 200
@@ -240,17 +255,14 @@ def end_session():
     active_session_id = session.pop("active_session_id", None)
     print(f"🛑 Sesi diakhiri: {active_session_id}")
     
-    # Reset camera status jika sesi diakhiri
-    global camera_in_use
-    with camera_lock:
-        camera_in_use = False
+    stop_stream_event.set() # <<< PERUBAHAN: Pastikan stream berhenti saat sesi berakhir
     
     return jsonify({
         'message': 'Sesi aktif telah diakhiri',
         'session_id': active_session_id
     }), 200
 
-# Rute-rute debugging
+# --- Rute Debugging ---
 @app.route('/api/debug-session')
 def debug_session():
     return jsonify(dict(session))
@@ -258,9 +270,7 @@ def debug_session():
 @app.route('/logout')
 def logout():
     session.clear()
-    global camera_in_use
-    with camera_lock:
-        camera_in_use = False
+    stop_stream_event.set() # <<< PERUBAHAN: Pastikan stream berhenti saat logout
     return "Session cleared!"
 
 @app.route('/api/logs/all')
@@ -271,6 +281,6 @@ def get_all_logs():
 def get_all_sessions():
     return jsonify(sessions_storage)
 
-
+# --- Main Execution ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
