@@ -1,5 +1,3 @@
-# app.py (Direvisi)
-
 from flask import Flask, request, jsonify, Response, session
 from flask_cors import CORS
 import cv2
@@ -7,9 +5,12 @@ from ultralytics import YOLO
 from datetime import datetime
 import time
 import uuid
+import threading
 
 logs_storage = []
 sessions_storage = []
+camera_in_use = False
+camera_lock = threading.Lock()
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.1.3:3000"])
@@ -37,12 +38,22 @@ def find_matching_box(label, center_x, center_y, used_ids, instance_labels):
     return None
 
 def generate_frames(classtype='None', usedModel='None', active_session_id=None):
+    global camera_in_use
+    
     if not active_session_id:
         print("⚠️ Peringatan: generate_frames dipanggil tanpa active_session_id.")
         return
+    with camera_lock:
+        if camera_in_use:
+            print("⚠️ Kamera sedang digunakan oleh proses lain.")
+            return
+        camera_in_use = True
+    
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("❌ Gagal membuka kamera.")
+        with camera_lock:
+            camera_in_use = False
         return
 
     instance_labels = {}
@@ -122,10 +133,21 @@ def generate_frames(classtype='None', usedModel='None', active_session_id=None):
     finally:
         print(f"🎥 Melepaskan kamera untuk stream sesi {active_session_id}.")
         cap.release()
+        with camera_lock:
+            camera_in_use = False
 
 def find_session_by_id(session_id):
     return next((s for s in sessions_storage if s['session_id'] == session_id), None)
 
+@app.route('/api/camera-status')
+def camera_status():
+    """Endpoint untuk cek status kamera"""
+    active_session_id = session.get("active_session_id")
+    return jsonify({
+        'camera_in_use': camera_in_use,
+        'has_active_session': active_session_id is not None,
+        'active_session_id': active_session_id
+    })
 
 @app.route('/video_feed/<classtype>')
 def video_feed(classtype):
@@ -217,12 +239,18 @@ def get_sessions():
 def end_session():
     active_session_id = session.pop("active_session_id", None)
     print(f"🛑 Sesi diakhiri: {active_session_id}")
+    
+    # Reset camera status jika sesi diakhiri
+    global camera_in_use
+    with camera_lock:
+        camera_in_use = False
+    
     return jsonify({
         'message': 'Sesi aktif telah diakhiri',
         'session_id': active_session_id
     }), 200
 
-# Rute-rute debugging bisa tetap ada jika diperlukan
+# Rute-rute debugging
 @app.route('/api/debug-session')
 def debug_session():
     return jsonify(dict(session))
@@ -230,6 +258,9 @@ def debug_session():
 @app.route('/logout')
 def logout():
     session.clear()
+    global camera_in_use
+    with camera_lock:
+        camera_in_use = False
     return "Session cleared!"
 
 @app.route('/api/logs/all')
@@ -242,5 +273,4 @@ def get_all_sessions():
 
 
 if __name__ == '__main__':
-    # Pastikan host 0.0.0.0 agar bisa diakses dari perangkat lain di jaringan yang sama
-    app.run(host='0.0.0.0', port=8000, debug=True) # debug=True membantu melihat log error
+    app.run(host='0.0.0.0', port=8000, debug=True)
