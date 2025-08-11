@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiChevronLeft, FiChevronRight, FiVideo, FiVideoOff } from 'react-icons/fi';
+import { FiPlay, FiPause, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const CameraControls = ({ 
   isCameraOn, 
@@ -7,36 +7,57 @@ const CameraControls = ({
   onPrevCamera, 
   onNextCamera, 
   cameraIndex, 
-  totalCameras 
-}) => (
-  <div className="bg-dark-blue p-3 rounded-lg flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <button 
-        onClick={onToggleCamera} 
-        className="p-2 bg-white/10 rounded-full hover:bg-indigo-500 transition-colors duration-200"
-        title={isCameraOn ? "Turn Camera Off" : "Turn Camera On"}
+  totalCameras,
+  disabled = false
+}) => {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <button
+        onClick={onToggleCamera}
+        disabled={disabled}
+        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+          disabled 
+            ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+            : isCameraOn
+            ? 'bg-red-500 hover:bg-red-600 text-white'
+            : 'bg-green-500 hover:bg-green-600 text-white'
+        }`}
       >
-        {isCameraOn ? <FiVideo /> : <FiVideoOff />}
+        {isCameraOn ? <FiPause size={16} /> : <FiPlay size={16} />}
+        {isCameraOn ? 'Stop' : 'Start'}
       </button>
-      <span className="font-medium text-gray-300">
-        {isCameraOn ? "Camera is On" : "Camera is Off"}
-      </span>
+      
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onPrevCamera}
+          disabled={disabled || totalCameras <= 1}
+          className={`p-2 rounded-lg transition-colors ${
+            disabled || totalCameras <= 1
+              ? 'bg-gray-600 cursor-not-allowed opacity-50'
+              : 'bg-white/10 hover:bg-white/20'
+          }`}
+        >
+          <FiChevronLeft size={16} />
+        </button>
+        
+        <span className="text-sm px-2 py-1 bg-white/10 rounded">
+          {cameraIndex + 1}/{totalCameras}
+        </span>
+        
+        <button
+          onClick={onNextCamera}
+          disabled={disabled || totalCameras <= 1}
+          className={`p-2 rounded-lg transition-colors ${
+            disabled || totalCameras <= 1
+              ? 'bg-gray-600 cursor-not-allowed opacity-50'
+              : 'bg-white/10 hover:bg-white/20'
+          }`}
+        >
+          <FiChevronRight size={16} />
+        </button>
+      </div>
     </div>
-    <div className="flex items-center gap-2">
-      <button 
-        onClick={onPrevCamera} 
-        className="p-2 bg-white/10 rounded-full hover:bg-indigo-500 transition-colors duration-200"
-      >
-        <FiChevronLeft />
-      </button>
-      <button 
-        onClick={onNextCamera} 
-        className="p-2 bg-white/10 rounded-full hover:bg-indigo-500 transition-colors duration-200"
-      >
-        <FiChevronRight />
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 export default CameraControls;
