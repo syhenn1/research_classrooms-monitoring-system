@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import SummaryCard from "../components/SummaryCard";
 import PieChart from "../components/PieChart";
-import SideBar from "../components/SideBar";
 import ConfirmationModal from "../components/ConfirmationModal";
-import { FiCheckCircle } from "react-icons/fi";
+import { FiCheckCircle, FiLogOut, FiSave } from "react-icons/fi";
 
 const ResultPage = () => {
   const navigate = useNavigate();
@@ -26,20 +25,14 @@ const ResultPage = () => {
 
   useEffect(() => {
     const fetchDataAndCalculate = async () => {
-      if (!sessionId) {
-        navigate("/monitor");
-        return;
-      }
-
       try {
-        // Ambil detail session dari endpoint yang kamu kasih
         const sessionRes = await fetch(
           `http://127.0.0.1:8000/api/sessions/${sessionId}`,
           { credentials: "include" }
         );
         const sessionJson = await sessionRes.json();
         if (!sessionJson.session) {
-          navigate("/monitor");
+          navigate("/monitoring");
           return;
         }
 
@@ -172,7 +165,6 @@ const ResultPage = () => {
   if (loading || !resultData.sessionDetails) {
     return (
       <div className="flex h-screen bg-dark-blue">
-        <SideBar />
         <div className="flex-1 flex items-center justify-center text-white">
           {loading ? "Loading results..." : "No result data found."}
         </div>
@@ -182,7 +174,6 @@ const ResultPage = () => {
 
   return (
     <div className="flex h-screen bg-dark-blue">
-      <SideBar />
       <div className="flex-1 p-8 overflow-y-auto text-white font-sans animate-fade-in">
         <header className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
@@ -227,6 +218,14 @@ const ResultPage = () => {
         onConfirm={handleConfirmAndExport}
         onDeny={finishSession}
         sessionId={resultData.sessionDetails.session_id}
+        title="Finish Session"
+        message="Apakah Anda yakin ingin menyelesaikan sesi ini?"
+        confirmText="Selesaikan & Export .xlsx"
+        denyText="Selesaikan Tanpa Export"
+        confirmIcon={<FiSave />}
+        denyIcon={<FiLogOut />}
+        showCloseButton={true}
+        confirmButtonColor="bg-green-500 hover:bg-green-600"
       />
     </div>
   );
