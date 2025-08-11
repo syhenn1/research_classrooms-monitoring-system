@@ -51,7 +51,7 @@ const MonitorScreen = ({ type }) => {
   }, []);
 
   return (
-    <div className="w-full h-screen overflow-hidden">
+    <div className="w-full h-full overflow-hidden">
       <img
         src={`http://127.0.0.1:8000/video_feed/${type}`}
         alt="Video Stream"

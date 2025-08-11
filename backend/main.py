@@ -123,14 +123,20 @@ def find_session_by_id(session_id):
 @app.route('/video_feed/<classtype>')
 def video_feed(classtype):
     if classtype == 'quiz':
-        usedModel = "cheating-best"
+        usedModel = "disruption-best-v3"
     else:
         usedModel = 'yolov8n'
+    
+    # Ambil dari session sekali saja di sini
     active_session_id = session.get("active_session_id")
+    if not active_session_id:
+        return "No active session", 400
+    
     return Response(
         generate_frames(classtype, usedModel, active_session_id),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
+
 
 @app.route('/api/logs/<session_id>', methods=['GET'])
 def get_logs(session_id):
