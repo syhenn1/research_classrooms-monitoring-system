@@ -5,7 +5,12 @@ import Logs from "../components/Logs";
 import Counter from "../components/Counter";
 import { GoDotFill } from "react-icons/go";
 import ConfirmationModal from "../components/ConfirmationModal";
-import { FiCheckCircle, FiXCircle } from "react-icons/fi";
+import {
+  FiCheckCircle,
+  FiXCircle,
+  FiChevronLeft,
+  FiChevronRight,
+} from "react-icons/fi";
 
 const MonitoringPage = () => {
   const [mode, setMode] = useState("theory");
@@ -15,8 +20,35 @@ const MonitoringPage = () => {
   const [showQuizConfirm, setShowQuizConfirm] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
+  const [cameraCount, setCameraCount] = useState(1);
+  const [cameraIndex, setCameraIndex] = useState(0);
+  const [isSwitching, setIsSwitching] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleSwitchCamera = async (newIndex) => {
+    if (isSwitching) return;
+
+    setIsSwitching(true);
+    console.log(`Mencoba pindah ke kamera index: ${newIndex}`);
+
+    try {
+      console.log("Mengirim sinyal stop ke backend...");
+      await fetch("http://127.0.0.1:8000/api/camera/stop", {
+        method: "POST",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      console.log("Mengubah state kamera ke index baru.");
+      setCameraIndex(newIndex);
+    } catch (error) {
+      console.error("Gagal saat mencoba mengganti kamera:", error);
+    } finally {
+      setIsSwitching(false);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -43,11 +75,24 @@ const MonitoringPage = () => {
     }
   }, [location.search, navigate]);
 
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/cameras/available", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.count > 0) {
+          setCameraCount(data.count);
+          console.log(`Jumlah kamera terdeteksi: ${data.count}`);
+        }
+      })
+      .catch((err) => console.error("Gagal mengambil jumlah kamera:", err));
+  }, []);
+
   const confirmSwitchToQuiz = () => {
     setShowQuizConfirm(true);
   };
 
-  // ✅ PERUBAHAN UTAMA DI SINI
   const handleQuizConfirm = async () => {
     try {
       await fetch("http://127.0.0.1:8000/api/camera/stop", {
@@ -57,7 +102,6 @@ const MonitoringPage = () => {
 
       setMode("quiz");
       setQuizStarted(true);
-
     } catch (error) {
       console.error("Gagal menghentikan stream sebelum beralih mode:", error);
     } finally {
@@ -98,19 +142,39 @@ const MonitoringPage = () => {
         </p>
       </header>
 
-      {/* Content */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
-        {/* Live Monitor & Counter */}
         <div className="lg:col-span-2 flex flex-col gap-2 min-h-0">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 flex-1 overflow-hidden min-h-0">
-            <MonitorScreen type={mode} />
+            <MonitorScreen type={mode} cameraIndex={cameraIndex} />
           </div>
-          <div className="bg-white/5 backdrop-blur-sm p-2 rounded-lg border border-white/10 text-center">
+          <div className="bg-white/5 backdrop-blur-sm p-2 px-4 rounded-lg border border-white/10 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleSwitchCamera(cameraIndex - 1)}
+                disabled={isSwitching || cameraIndex === 0 || cameraCount <= 1}
+                className="px-3 py-2 bg-blue-600 text-white rounded disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              >
+                <FiChevronLeft />
+              </button>
+              <span className="text-white font-semibold text-sm px-2">
+                Kamera {cameraIndex + 1} / {cameraCount}
+              </span>
+              <button
+                onClick={() => handleSwitchCamera(cameraIndex + 1)}
+                disabled={
+                  isSwitching ||
+                  cameraIndex >= cameraCount - 1 ||
+                  cameraCount <= 1
+                }
+                className="px-3 py-2 bg-blue-600 text-white rounded disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              >
+                <FiChevronRight />
+              </button>
+            </div>
             <Counter />
           </div>
         </div>
 
-        {/* Activity Log & Controls */}
         <div className="flex flex-col gap-4 min-h-0">
           <div className="backdrop-blur-sm rounded-lg border p-3 flex-1 flex flex-col min-h-0">
             <h2 className="text-sm font-semibold mb-2">Activity Log</h2>
@@ -140,7 +204,9 @@ const MonitoringPage = () => {
         </div>
       </div>
 
-      {/* Modal Pindah ke Quiz */}
+
+
+
       <ConfirmationModal
         isOpen={showQuizConfirm}
         onClose={() => setShowQuizConfirm(false)}
@@ -155,7 +221,6 @@ const MonitoringPage = () => {
         showCloseButton={false}
       />
 
-      {/* Modal Akhiri Monitoring */}
       <ConfirmationModal
         isOpen={showEndConfirm}
         onClose={() => setShowEndConfirm(false)}
