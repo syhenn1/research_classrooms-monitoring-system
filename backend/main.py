@@ -26,6 +26,26 @@ app.config.update(
 
 PROXIMITY_THRESHOLD = 500
 
+def open_camera_safely(camera_index):
+    """
+    Mencoba membuka kamera dengan beberapa backend berbeda untuk kompatibilitas maksimal.
+    """
+    # Prioritas 1: Coba dengan DSHOW, sangat umum untuk Windows
+    cap = cv2.VideoCapture(camera_index + cv2.CAP_DSHOW)
+    if cap.isOpened():
+        print(f"✅ Kamera {camera_index} berhasil dibuka dengan backend DSHOW.")
+        return cap
+    
+    # Prioritas 2: Coba dengan backend default (bisa MSMF atau lainnya)
+    cap = cv2.VideoCapture(camera_index)
+    if cap.isOpened():
+        print(f"✅ Kamera {camera_index} berhasil dibuka dengan backend default.")
+        return cap
+        
+    # Jika semua gagal
+    print(f"❌ Gagal membuka kamera {camera_index} dengan semua metode yang dicoba.")
+    return None
+
 # --- Fungsi Helper ---
 def find_matching_box(label, center_x, center_y, used_ids, instance_labels):
     for existing_id, data in instance_labels.items():
@@ -41,7 +61,7 @@ def find_matching_box(label, center_x, center_y, used_ids, instance_labels):
             return existing_id
     return None
 
-def generate_frames(classtype='None', usedModel='None', active_session_id=None):
+def generate_frames(classtype='None', usedModel='None', active_session_id=None, camera_index=0):
     global camera_in_use
     
     stop_stream_event.clear() # <<< PERUBAHAN: Reset event setiap kali stream dimulai
@@ -56,14 +76,19 @@ def generate_frames(classtype='None', usedModel='None', active_session_id=None):
             return
         camera_in_use = True
     
-    cap = cv2.VideoCapture(0)
+    cap = open_camera_safely(camera_index)
+
     if not cap.isOpened():
-        print("❌ Gagal membuka kamera.")
+        print(f"❌ Gagal membuka kamera dengan indeks {camera_index}.")
         with camera_lock:
             camera_in_use = False
+        # Menghasilkan frame error agar frontend tahu ada masalah
+        yield (b'--frame\r\n'
+               b'Content-Type: text/plain\r\n\r\n'
+               b'Camera not found\r\n')
         return
 
-    print(f"🚀 Memulai stream untuk model: {usedModel} pada sesi: {active_session_id}")
+    print(f"🚀 Memulai stream dari kamera {camera_index} untuk model: {usedModel} pada sesi: {active_session_id}")
     instance_labels = {}
     instance_counter = 0
     
@@ -147,6 +172,19 @@ def generate_frames(classtype='None', usedModel='None', active_session_id=None):
 def find_session_by_id(session_id):
     return next((s for s in sessions_storage if s['session_id'] == session_id), None)
 
+
+@app.route('/api/cameras/available')
+def get_available_cameras():
+    count = 0
+    for i in range(10):
+        cap = open_camera_safely(i)
+        if cap:
+            count += 1
+            cap.release()
+        else:
+            break
+    return jsonify({'count': count})
+
 # --- Endpoints ---
 @app.route('/api/camera/stop', methods=['POST']) # <<< PERUBAHAN: Endpoint baru untuk stop kamera
 def stop_camera_stream():
@@ -166,8 +204,8 @@ def camera_status():
         'active_session_id': active_session_id
     })
 
-@app.route('/video_feed/<classtype>')
-def video_feed(classtype):
+@app.route('/video_feed/<classtype>/<int:camera_index>')
+def video_feed(classtype, camera_index):
     if classtype == 'quiz':
         usedModel = "disruption-best-v3"
     else:
@@ -179,7 +217,8 @@ def video_feed(classtype):
         return "Sesi aktif tidak ditemukan.", 400
     
     return Response(
-        generate_frames(classtype, usedModel, active_session_id),
+        # <<< PERUBAHAN: Kirim camera_index ke generator
+        generate_frames(classtype, usedModel, active_session_id, camera_index),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
 
