@@ -1,6 +1,7 @@
+// MonitorScreen.jsx
 import { useEffect, useState, useRef } from "react";
 
-const MonitorScreen = ({ type }) => {
+const MonitorScreen = ({ type, cameraIndex }) => {
   const [, setLogs] = useState([]); // State untuk data log
   const [, setEventCounts] = useState({}); // Counter kejadian
   const activeLabels = useRef({}); // Untuk tracking deteksi aktif
@@ -51,11 +52,12 @@ const MonitorScreen = ({ type }) => {
   }, []);
 
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="w-full h-full relative">
       <img
-        src={`http://127.0.0.1:8000/video_feed/${type}`}
-        alt="Video Stream"
+        src={`http://127.0.0.1:8000/video_feed/${type}/${cameraIndex}`}
+        alt={`Video Stream from Camera ${cameraIndex}`}
         className="w-full h-full object-cover"
+        key={`${type}-${cameraIndex}`} // Memaksa reload jika type atau index berubah
       />
     </div>
   );
