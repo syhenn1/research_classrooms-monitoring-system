@@ -129,10 +129,10 @@ const ResultPage = () => {
         (log) => log.session_id === resultData.sessionDetails.session_id
       );
 
-      const theoryTotal = filteredLogs.filter(
+      const disruptionTotal = filteredLogs.filter(
         (log) => log.classtype === "theory"
       ).length;
-      const quizTotal = filteredLogs.filter(
+      const cheatingTotal = filteredLogs.filter(
         (log) => log.classtype === "quiz"
       ).length;
 
@@ -143,12 +143,9 @@ const ResultPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ theoryTotal, quizTotal }),
+          body: JSON.stringify({ disruptionTotal, cheatingTotal }),
         }
       );
-      await fetch("http://127.0.0.1:8000/api/session/end", {
-        method: "POST",
-      });
     } catch (error) {
       console.error("Error saving session:", error);
       alert("Failed to save session. Please try again.");

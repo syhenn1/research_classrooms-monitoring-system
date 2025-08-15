@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import MonitoringPage from "./pages/MonitoringPage";
 import ResultPage from "./pages/ResultPage";
 import "./index.css";
+import HistoryPage from "./pages/HistoryPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/monitoring" element={<MonitoringPage />} />
           <Route path="/result" element={<ResultPage />} />
+          <Route path="/history" element={<HistoryPage />} />
         </Route>
         
         <Route path="/" element={<Navigate to="/setup" />} />
