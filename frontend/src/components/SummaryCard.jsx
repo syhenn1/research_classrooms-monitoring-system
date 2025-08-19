@@ -1,8 +1,28 @@
 import React from 'react';
 import { FiAlertTriangle, FiBookOpen, FiClock } from 'react-icons/fi';
 
-const SummaryCard = ({ sessionDetails, totalDisruption, theoryDuration, totalCheating, quizDuration }) => {
+const SummaryCard = ({ 
+  sessionDetails, 
+  totalDisruption, 
+  theoryDuration, 
+  totalCheating, 
+  quizDuration,
+  disruptionDetails,
+  cheatingDetails
+}) => {
   if (!sessionDetails) return null;
+
+  // Komponen kecil untuk list detail
+  const DetailList = ({ details }) => (
+    <ul className="mt-2 text-sm text-gray-300 space-y-1">
+      {Object.entries(details || {}).map(([label, count]) => (
+        <li key={label} className="flex justify-between">
+          <span className="capitalize">{label}</span>
+          <span className="font-semibold">{count}</span>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <div className="w-full h-full p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 flex flex-col">
@@ -27,7 +47,10 @@ const SummaryCard = ({ sessionDetails, totalDisruption, theoryDuration, totalChe
               <span>{theoryDuration}</span>
             </div>
           </div>
-          <div className="mt-2 text-4xl font-bold">{totalDisruption} <span className="text-xl font-medium text-gray-400">Disruptions</span></div>
+          <div className="mt-2 text-4xl font-bold">
+            {totalDisruption} <span className="text-xl font-medium text-gray-400">Disruptions</span>
+          </div>
+          <DetailList details={disruptionDetails} />
         </div>
 
         {/* Bagian Kuis / Cheating */}
@@ -42,7 +65,10 @@ const SummaryCard = ({ sessionDetails, totalDisruption, theoryDuration, totalChe
               <span>{quizDuration}</span>
             </div>
           </div>
-          <div className="mt-2 text-4xl font-bold">{totalCheating} <span className="text-xl font-medium text-gray-400">Cheating Events</span></div>
+          <div className="mt-2 text-4xl font-bold">
+            {totalCheating} <span className="text-xl font-medium text-gray-400">Cheating Events</span>
+          </div>
+          <DetailList details={cheatingDetails} />
         </div>
       </div>
     </div>
