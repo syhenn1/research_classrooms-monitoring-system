@@ -71,6 +71,15 @@ const ResultPage = () => {
           str += `${seconds}s`;
           return str.trim() || "0s";
         };
+        const groupByLabel = (logs) => {
+          return logs.reduce((acc, log) => {
+            if (!acc[log.label]) {
+              acc[log.label] = 0;
+            }
+            acc[log.label] += 1;
+            return acc;
+          }, {});
+        };
 
         setResultData({
           sessionDetails: sessionJson.session,
@@ -79,6 +88,8 @@ const ResultPage = () => {
           theoryDuration: formatDuration(theoryLogs),
           quizDuration: formatDuration(quizLogs),
           allLogs: relevantLogs,
+          disruptionDetails: groupByLabel(theoryLogs),
+          cheatingDetails: groupByLabel(quizLogs),
         });
       } catch (error) {
         console.error("Error processing result data:", error);
@@ -189,6 +200,8 @@ const ResultPage = () => {
               theoryDuration={resultData.theoryDuration}
               totalCheating={resultData.totalCheating}
               quizDuration={resultData.quizDuration}
+              disruptionDetails={resultData.disruptionDetails}
+              cheatingDetails={resultData.cheatingDetails}
             />
           </div>
           <div className="lg:col-span-2 flex flex-col gap-6">

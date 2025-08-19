@@ -266,7 +266,7 @@ def video_feed(classtype, camera_index):
     if classtype == 'quiz':
         usedModel = "yolov8n"
     else:
-        usedModel = 'disruption-best-v3'
+        usedModel = 'yolov8n'
     active_session_id = session.get("active_session_id")
     if not active_session_id:
         return "Sesi aktif tidak ditemukan.", 400
