@@ -78,7 +78,7 @@ app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 
 MODELS = {
     'quiz': YOLO('models/yolov8n.pt'),
-    'disruption': YOLO('models/disruption-best-v2.pt')
+    'disruption': YOLO('models/yolov8n.pt')
 }
 if DEVICE == 'cuda':
     for model_name in MODELS:
