@@ -35,6 +35,14 @@ const HomePage = () => {
         <div className="flex flex-col">
           <SessionSetupForm time={time} date={date} />
         </div>
+        <button>
+          <a
+            href="/history"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105"
+          >
+            History
+          </a>
+        </button>
       </div>
       <ConfirmationModal
         autoCheckSession={true}

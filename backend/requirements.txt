@@ -5,3 +5,5 @@ ultralytics
 mysql-connector-python
 Flask-Migrate
 Flask-SQLAlchemy
+flask-socketio
+eventlet
