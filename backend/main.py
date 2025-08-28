@@ -77,7 +77,7 @@ app.secret_key = "ganti_dengan_kunci_rahasia_yang_aman"
 app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 
 MODELS = {
-    'quiz': YOLO('models/yolov8n.pt'),
+    'quiz': YOLO('models/cheat-best-1.pt'),
     'disruption': YOLO('models/yolov8n.pt')
 }
 if DEVICE == 'cuda':
