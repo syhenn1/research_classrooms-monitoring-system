@@ -73,11 +73,8 @@ git clone https://github.com/syhenn1/research_classrooms-monitoring-system.git
 cd frontend
 
 # 3. Instal semua dependency
-npm install concurrently react-router-dom
+npm install concurrently react-router-dom xlsx chart.js react-chartjs-2 socket.io-client lucide-react chartjs-adapter-date-fns
 npm install -D tailwindcss postcss autoprefixer
-npm install xlsx
-npm install chart.js react-chartjs-2
-npm install socket.io-client
 npx tailwindcss init
 
 ```
