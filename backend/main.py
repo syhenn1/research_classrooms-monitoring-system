@@ -115,7 +115,10 @@ class MonitoringManager:
     def _find_matching_box(self, label, center_x, center_y, used_ids, instance_labels):
         for existing_id, data in instance_labels.items():
             if existing_id in used_ids: continue
-            existing_label, ex, ey, _ = existing_id.split('_')
+            parts = existing_id.split('_', 3)
+            if len(parts) != 4:
+                continue  
+            existing_label, ex, ey, _ = parts
             if existing_label != label: continue
             ex = int(ex)
             ey = int(ey)
